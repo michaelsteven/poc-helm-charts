@@ -1,1 +1,3 @@
 # microservice specific kubernetes deployment values go in here
+podDisruptionBudget:
+  minAvailable: 1

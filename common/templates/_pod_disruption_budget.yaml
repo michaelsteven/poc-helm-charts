@@ -1,0 +1,20 @@
+{{- define "common.PodDisruptionBudget" }}
+{{- if .Values.podDisruptionBudget.minAvailable -}}
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ .Chart.Name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: {{ .Chart.Name }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+      env: {{ .Values.env_name }}
+  minAvailable: {{ .Values.podDisruptionBudget.minAvailable }}
+{{- end -}}
+{{- end -}}

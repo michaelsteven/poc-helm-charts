@@ -1,0 +1,42 @@
+{{- define "common.container.tpl" -}}
+name: {{ .Chart.Name }}
+image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+imagePullPolicy: {{ .Values.image.pullPolicy }}
+ports:
+- name: http
+  containerPort: 80
+resources:
+{{ toYaml .Values.resources | indent 2 }}
+{{- end -}}
+
+{{- with .Values.readinessProbe }}
+readinessProbe:
+  {{- with .httpGet }}
+  httpGet:
+    port: {{ .port }}
+    path: {{ .path }}
+  {{- end}}
+  initialDelaySeconds: {{ .initialDelaySeconds }}
+  timeoutSeconds: {{ .timeoutSeconds}}
+  periodSeconds: {{ .periodSeconds }}
+  failureThreshold: {{ .failureThreshold }}
+{{- end }}
+
+{{- with .Values.livenessProbe }}
+livenessProbe:
+  {{- with .httpGet }}
+  httpGet:
+    port: {{ .port }} 
+    path: {{ .path }} 
+  {{- end }}
+  initialDelaySeconds: {{ .initialDelaySeconds | default "300" }} 
+  timeoutSeconds: {{ .timeoutSeconds | default "10" }}
+  periodSeconds: {{ .periodSeconds | default "30" }}
+  failureThreshold: {{ .failureThreshold | default "5" }}
+{{- end }}
+
+{{- define "common.container" -}}
+{{- /* clear new line so indentation works correctly */ -}}
+{{- println "" -}}
+{{- include "common.util.merge" (append . "common.container.tpl") | indent 8 -}}
+{{- end -}}
